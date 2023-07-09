@@ -1,0 +1,39 @@
+= Hands-on-lab Ignite et Quarkus
+:author: Yann Blazart, Pierre Cesmat, Antoine Sabot-Durand
+:email: yann.blazart@sciam.fr
+:revnumber: 1.0
+:revdate: 10 Juillet 2023
+:doctype: book
+
+
+== Bienvenue dans notre Hands-on-lab sur Ignite et Quarkus !
+
+=== Pré-requis
+
+Assurez-vous de disposer :
+
+* d'un compte GtiHub
+* d'un jdk 11
+* de maven 3.9.1+
+* de votre IDE preféré que vous maîtrisez, avec l'annotation processing activé (Lombok)
+* Inscrivez-vous gratuitement sur l'outil Nebula de Gridgain https://portal.gridgain.com/auth/signin[ici], cet outil nous permettera de monitorer nos clusters.
+
+=== Démarrage
+
+Une fois ceci en place, vous pourrez remarquer que le projet contient 1 module par TP.
+Chaque module contient un fichier TPx.md qui vous donne la marche à suivre.
+
+Le framework Apache Ignite est très riche en fonctionnalités.
+Le but de cd HOL est de vous donner quelques exemples et envie d'aller plus loin.
+
+https://tinyurl.com/5eshwjpa
+
+:sectnums:
+
+:leveloffset: +1
+
+include::tp1.adoc[]
+
+include::tp2.adoc[]
+
+include::tp3.adoc[]

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>fr.sciam</groupId>
+  <artifactId>quarkus-ignite-lab</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>doc</module>
+    <module>ignite</module>
+    <module>tp1-2</module>
+    <module>tp3</module>
+  </modules>
+
+  <properties>
+    <compiler-plugin.version>3.10.1</compiler-plugin.version>
+    <maven.compiler.release>17</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
+    <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
+    <quarkus.platform.version>3.0.3.Final</quarkus.platform.version>
+    <skipITs>true</skipITs>
+    <surefire-plugin.version>3.1.2</surefire-plugin.version>
+    <ignite.version>2.14.0</ignite.version>
+    <jvm.args>
+      <![CDATA[  --add-opens java.base/java.lang.invoke=ALL-UNNAMED --add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED --add-opens=jdk.internal.jvmstat/sun.jvmstat.monitor=ALL-UNNAMED --add-opens=java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED ]]></jvm.args>
+  </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>${quarkus.platform.group-id}</groupId>
+        <artifactId>${quarkus.platform.artifact-id}</artifactId>
+        <version>${quarkus.platform.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.ignite</groupId>
+        <artifactId>ignite-core</artifactId>
+        <version>${ignite.version}</version>
+      </dependency>
+    </dependencies>
+
+  </dependencyManagement>
+
+</project>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>fr.sciam</groupId>
+    <artifactId>quarkus-ignite-lab</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>ignite</artifactId>
+  <packaging>pom</packaging>
+
+  <properties>
+    <ignite.version>2.14.0</ignite.version>
+    <agent.version>2.14.0.0</agent.version>
+    <ignite.dirName>apache-ignite-${ignite.version}-bin</ignite.dirName>
+    <ignite.zipName>${ignite.dirName}.zip</ignite.zipName>
+    <agent.zipName>control-center-agent-${agent.version}.zip</agent.zipName>
+    <ignite.url>https://archive.apache.org/dist/ignite/${ignite.version}/${ignite.zipName}</ignite.url>
+    <agent.url>https://www.gridgain.com/media/control-center-agent/${agent.zipName}</agent.url>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>wagon-maven-plugin</artifactId>
+        <version>2.0.2</version>
+        <executions>
+          <execution>
+            <id>download-ignite</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>download-single</goal>
+            </goals>
+            <configuration>
+              <url>${ignite.url}</url>
+              <toDir>${project.build.directory}</toDir>
+            </configuration>
+          </execution>
+          <execution>
+            <id>download-agent</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>download-single</goal>
+            </goals>
+            <configuration>
+              <url>${agent.url}</url>
+              <toDir>${project.build.directory}</toDir>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>prepare</id>
+            <phase>process-resources</phase>
+            <configuration>
+              <tasks>
+                <echo message="prepare phase"/>
+                <unzip src="target/${ignite.zipName}" dest="target"/>
+                <unzip src="target/${agent.zipName}" dest="target/${ignite.dirName}"/>
+                <move file="target/${ignite.dirName}/libs/optional/ignite-rest-http" toFile="target/${ignite.dirName}/libs/ignite-rest-http"/>
+                <move file="target/${ignite.dirName}/libs/optional/ignite-calcite" toFile="target/${ignite.dirName}/libs/ignite-calcite"/>
+                <copy file="conf/node-configuration.xml" toFile="target/${ignite.dirName}/conf/node-configuration.xml"/>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+
+</project>

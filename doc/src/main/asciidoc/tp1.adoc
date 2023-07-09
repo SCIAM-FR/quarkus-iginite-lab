@@ -1,0 +1,177 @@
+= TP1 : découverte d'apache ignite avec Quarkus en pure client
+:data-uri:
+
+== Déploiement de 3 nodes Ignite serveur
+
+Nous avons un projet qui prépare des serveurs ignite.
+
+Pour le déployer, veuillez exécuter :
+
+Pour linux/mac :
+
+[,shell]
+----
+cd ../ignite
+./mvnw clean install
+chmod +x ./target/apache-ignite-2.14.0-bin/bin/ignite.sh
+----
+
+Pour windows :
+
+[,shell]
+----
+cd ../ignite
+./mvnw.cmd clean install
+----
+
+Une fois la préparation faite, nous pouvons lancer 3 fois les commandes suivantes (une fois par terminal)
+
+Pour linux/mac :
+
+[,shell]
+----
+cd ../ignite/target/apache-ignite-2.14.0-bin
+export OPTION_LIBS=ignite-rest-http,ignite-calcite
+export CONFIG_URI=file://config/node-configuration.xml
+export JVM_OPTS="-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDirectMemorySize=256m"
+./bin/ignite.sh
+----
+
+Pour windows powershell :
+
+[,shell]
+----
+$env:OPTION_LIBS = 'ignite-rest-http,ignite-calcite'
+$env:CONFIG_URI = 'file://config/node-configuration.xml'
+$env:JVM_OPTS = '-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDirectMemorySize=256m'
+../ignite\target\apache-ignite-2.14.0-bin/bin/ignite.bat
+----
+
+Dans les logs d'un des nœuds, vous trouverez l'URL pour brancher un outil de monitoring fourni pas Gridgain :  image:../resources/images/screen3.png[img.png]
+
+Copiez-collez cette URL dans votre navigateur préféré et inscrivez-vous (gratuitement).
+Vous pourrez alors explorer votre cluster.
+Nous utiliserons Nebula par la suite.
+
+image:../resources/images/screen4.png[img.png] image:../resources/images/screen5.png[img.png]
+
+*Attention* le token d'enregistrement n'est valide que 5 minutes !
+
+Apache ignite fournis en standard une api REST, nous allons l'utiliser pour vérifier le fonctionnement du cluster.
+Il y a un fichier contenant l'URL ci-dessous link:src/http-requests/ignite-rest/get-version.http[ici] si votre IDE permet de l'exécuter, sinon :
+
+[,http request]
+----
+http://localhost:8080/ignite?cmd=version
+----
+
+== Création rapide d'un client Quarkus
+
+Vous avez certainement noté que les services Rest Ignite écoutent sur le port 8080.
+Nous allons devoir indiquer à quarkus d'utiliser un autre port.
+
+Dans le fichier application.properties des resources, ajoutez la propriété suivante :
+
+[,properties]
+----
+quarkus.http.port=8083
+----
+
+Passons maintenant au client.
+Ajoutez un Producer qui va créer l'instance de l'objet IgniteClient :
+
+[,java]
+----
+@ApplicationScoped
+@RequiredArgsConstructor
+@Slf4j
+public class IgniteClientProducer {
+
+    @Produces
+    @ApplicationScoped
+    public IgniteClient igniteClient() {
+        ClientConfiguration cfg = new ClientConfiguration().setAddresses("127.0.0.1:10800");
+        return Ignition.startClient(cfg);
+    }
+}
+----
+
+Puis créez un service REST qui va se connecter, récupérer un compteur atomic et l'incrémenter à chaque appel.
+
+[,java]
+----
+@Produces(MediaType.APPLICATION_JSON)
+@Path("/ignite/testconnect")
+@Slf4j
+@RequiredArgsConstructor
+public class ConnectToIgniteCluster {
+    private final IgniteClient igniteClient;
+
+    @GET
+    public Response testConnect() {
+        ClientAtomicLong hitCounter = igniteClient.atomicLong("hitCounter", 0L, true);
+        long counter = hitCounter.incrementAndGet();
+        log.info("Current hit {}", counter);
+        return Response.ok("{ Hit : \"" + counter + "\"}").build();
+    }
+    public void disposeIgniteClient(@Disposes IgniteClient igniteClient) {
+        igniteClient.close();
+    }
+}
+----
+
+Vérifions le fonctionnement :
+
+[,shell]
+----
+./mvnw quarkus:dev
+----
+
+Puis une fois démarré, lancer plusieurs fois la requête http link:src/http-requests/java-client/test-igniteclientconnectionapi.http[ici] et vérifiez dans les logs ce qu'il se passe.
+
+== Déploiement d'une deuxième instance du service
+
+Mais, comment être sûr que le compteur n'est pas local ?
+
+Eh bien, nous allons utiliser une deuxième instance !
+
+Pour linux/mac :
+
+[,shell]
+----
+./mvnw quarkus:dev -Dquarkus.http.port=8084 -Ddebug=5006
+----
+
+Pour windows powershell :
+
+[,shell]
+----
+./mvnw quarkus:dev "-Dquarkus.http.port=8084" "-Ddebug=5006"
+----
+
+Maintenant, vous pouvez jouer la requête http sur votre 2e instance link:src/http-requests/java-client/test-igniteclientconnectionapi2.http[ici]
+
+Dans les logs des serveurs, vous verrez les compteurs s'incrémenter sur les deux nœuds.
+
+== Explorez d'autres possibilités
+
+Le client Java Thin fourni une API riche et permet d'utiliser la majorité des fonctionnalités d'apache Ignite.
+
+image::../resources/images/screen6.png[img.png]
+
+Vous pouvez voir les détails dans la documentation officielle d'Apache Ignite https://ignite.apache.org/docs/latest/thin-clients/java-thin-client[ici].
+
+Les principales différences se situent au niveau des possibilités des services, qui dans le cas du client thin, doivent être déjà déployés sur le serveur, contrairement aux autres modes permettant le peer classloading.
+Les clients thin n'hébergent pas de donnée non plus, exception faite des near caches.
+
+=== Les caches  (https://ignite.apache.org/docs/latest/key-value-api/basic-cache-operations)
+
+En vous servant de l'api cache coté client (https://ignite.apache.org/docs/latest/thin-clients/java-thin-client)
+
+[,java]
+----
+ClientCache<Integer, String> cache = client.cache("myCache");
+----
+
+Créez-vous un service REST pour ajouter des données à un cache et un autre pour les lire.
+Servez vous de la Swagger UI pour tester vos services (http://localhost:8081/q/dev-ui/io.quarkus.quarkus-smallrye-openapi/swagger-ui) (http://localhost:8085/q/dev-ui/io.quarkus.quarkus-smallrye-openapi/swagger-ui)

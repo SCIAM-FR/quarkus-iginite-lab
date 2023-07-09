@@ -1,0 +1,338 @@
+= TP2 : Apache ignite, une base de données distribuée
+
+== Si vous n'aviez pas executé le TP1
+
+=== Déploiement de 3 nodes Ignite serveur
+
+Nous avons un projet qui prépare des serveurs ignite.
+
+Pour le déployer, veuillez éxécuter :
+
+Pour linux/mac :
+
+[,shell]
+----
+cd ../ignite
+./mvnw clean install
+chmod +x ./target/apache-ignite-2.14.0-bin/bin/ignite.sh
+----
+
+Pour windows :
+
+[,shell]
+----
+cd ../ignite
+./mvnw.cmd clean install
+----
+
+Une fois la préparation faite, nous pouvons lancer 3 fois les commandes suivantes (une fois par terminal)
+
+Pour linux/mac :
+
+[,shell]
+----
+cd ../ignite/target/apache-ignite-2.14.0-bin
+export OPTION_LIBS=ignite-rest-http,ignite-calcite
+export CONFIG_URI=file://config/node-configuration.xml
+export JVM_OPTS="-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDirectMemorySize=256m   --add-opens java.base/java.lang.invoke=ALL-UNNAMED "
+./bin/ignite.sh
+----
+
+Pour windows powershell :
+
+[,shell]
+----
+$env:OPTION_LIBS = 'ignite-rest-http,ignite-calcite'
+$env:CONFIG_URI = 'file://config/node-configuration.xml'
+$env:JVM_OPTS = '-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDirectMemorySize=256m'
+../ignite\target\apache-ignite-2.14.0-bin/bin/ignite.bat
+----
+
+Dans les logs d'un des noeud, vous trouverez l'url pour plugguer un outils de monitoring fournis pas gridgain : image:../resources/images/screen3.png[img.png]
+
+Copiez-collez cette url dans votre navigateur préféré et inscrivez-vous (gratuitement).
+Vous pourrez alors explorer votre cluster.
+Nous utiliserons Nebula par la suite.
+
+image:../resources/images/screen4.png[img.png] image:../resources/images/screen5.png[img.png]
+
+*Attention* le token d'enregistrement n'est valide que 5 minutes !
+
+== Création de tables SQL dans Apache Ignite :
+
+La documentation sur l'utilisation du SQL avec Apache Ignite est https://ignite.apache.org/docs/latest/SQL/sql-introduction[ici].
+
+Nous utilisons le moteur Apache Calcite en lieu et place de H2, car dans le mode embarqué, les différentes versions de H2 rentrent en conflit entre celle de ignite et celle de quarkus.
+
+Ignite permet de définir la topologie de stockage des caches essentiellement selon deux modes :
+
+* Replicated : les données sont copiées sur tous les nœuds.
+* Partitioned : les données sont réparties entre les nœuds selon une clef d'affinité que l'on fournit.
+Cela permet par exemple de colocaliser les données sur les même nœuds afin d'optimiser les calculs.
+
+De plus on peut definir un certain nombre de copies, qui permettent de s'assurer de ne pas perde de donnée si un un noeud tombe.
+
+Nous allons créer des Tables/Caches "Accounts" et "Operations", puis les remplir avec des données de tests.
+
+=== Création des tables.
+
+Les sources contiennent 2 scripts sqls que nous allons executer avec le Thin Client.
+
+Table Accounts :
+
+[,sql]
+----
+create table if not exists ACCOUNTS
+(
+    id varchar(40) primary key,
+    amount decimal(10,2)
+) with "TEMPLATE=REPLICATED,BACKUPS=2,AFFINITY_KEY=id,CACHE_NAME=accounts,VALUE_TYPE=fr.sciam.lab.ignite.model.Account,KEY_TYPE=fr.sciam.lab.ignite.model.AccountKey";
+----
+
+Table Operations :
+
+[,sql]
+----
+create table if not exists OPERATIONS
+(
+    id varchar(40) ,
+    accountId varchar(40),
+    amount decimal(10,2),
+    primary key (id, accountId)
+) with "TEMPLATE=PARTITIONED,BACKUPS=2,AFFINITY_KEY=accountId,CACHE_NAME=operations,VALUE_TYPE=fr.sciam.lab.ignite.model.Operation,KEY_TYPE=ffr.sciam.lab.ignite.model.OperationKey";
+----
+
+Pour appliquer ces scripts nous allons les jouer en créant un service Rest dans Quarkus.
+Créez une classe CreateSchemas :
+
+[,java]
+----
+@Path("/ignite/tp2/createSchemas")
+@Slf4j
+@RequiredArgsConstructor
+public class CreateSchemas {
+    private final IgniteClient igniteClient;
+    @GET
+    public Response createSchemas() throws IOException {
+        ClientCache<Long, String> cache = igniteClient
+                .getOrCreateCache(new ClientCacheConfiguration().setName("PUBLIC"));
+        createTable(cache, "operations").getAll();
+        createTable(cache, "accounts").getAll();
+        return Response.ok().build();
+    }
+    private FieldsQueryCursor<List<?>> createTable(ClientCache<Long, String> cache, String table) throws IOException {
+        String sql = IOUtils.toString(getClass().getResourceAsStream("/create-schema-" + table + ".sql"), StandardCharsets.UTF_8);
+        log.info("Apply sql : {}",sql);
+        return cache.query(new SqlFieldsQuery(sql));
+    }
+}
+----
+
+Puis lancez votre Quarkus :
+
+[,shell]
+----
+./mvnw quarkus:dev
+----
+
+Et ensuite vous pouvez appeler votre service Rest link:src/http-requests/ignite-db/createSchemas.http[ici].
+
+Vous pouvez ensuite vérifier dans Nebula l'apparition des caches et des tables dans l'onglet Caches
+
+image::../resources/images/screen2.1.png[img.png]
+
+L'onglet 'distribution' vous permet de voir comment sont réparties les partitions entre chaques nœuds.
+
+Sur la gauche, vous pouvez cliquer sur 'SQL' pour accéder aux outils d'interrogation de la BDD H2.
+
+image::../resources/images/screen2.2.png[img.png]
+
+=== Accès par JDBC
+
+Il est possible d'utiliser JDBC (donc votre outils préféré) pour accèder à la BDD distribuée.
+Le driver se trouve dans le jar core
+
+[,xml]
+----
+<dependency>
+    <groupId>org.apache.ignite</groupId>
+    <artifactId>ignite-core</artifactId>
+    <version>2.14.0</version>
+</dependency>
+----
+
+L'url de connexion est dans notre cas :
+
+[,thymeleafurlexpressions]
+----
+jdbc:ignite:thin://localhost:10800/PUBLIC
+----
+
+Et le driver :
+
+[,java]
+----
+org.apache.ignite.IgniteJdbcThinDriver
+----
+
+== Création du jeu de données
+
+Nos tables sont là,mais vides.
+Nous pourrions utiliser l'interface Nebula pour les rempir  à l'aide d'INSERT, ou alors utiliser du code pour le faire :
+
+=== Model Java
+
+Nous allons en premier lieu créer les Pojos qui vont nous aider dans notre tâche.
+Vous aviez dû remarquer dans les scripts SQL que nous faisions référence à des classes Java avec les paramètres supplémentaires VALUE_TYPE et KEY_TYPE.
+
+En effet, la clef primaire de la table sert de clef de cache.
+Et la valeur dans le cache représente le reste des colonnes.
+Nous devons donc créer deux classes par Table dans le package :
+
+[,java]
+----
+package fr.sciam.lab.ignite.model;
+----
+
+Classe Account :
+
+[,java]
+----
+@Data
+public class Account {
+    private BigDecimal amount;
+}
+----
+
+Class AccountKey :
+
+[,java]
+----
+@Data
+public class AccountKey implements Serializable {
+    @AffinityKeyMapped
+    private String id;
+}
+----
+
+Class Operation :
+
+[,java]
+----
+@Data
+public class Operation {
+    private BigDecimal amount;
+}
+----
+
+Class OperationKey :
+
+[,java]
+----
+@Data
+public class OperationKey implements Serializable {
+    private String id;
+    @AffinityKeyMapped
+    private String accountId;
+}
+----
+
+Vous remarquerez l'annotation @AffinityKeyMapped dans les class de clef.
+Nous identifions avec elles les champs qui rentrent en compte dans les calculs de clef d'affinité.
+Ce mécanisme nous garanti que lors de l'insertion des données, les Accounts et Operations ayant le même accountId seront stockés sur les mêmes nœuds.
+
+=== Alimentation
+
+Créons maintenant le service qui repmplira les tables.
+Nous allons générer des données corrects, qui ont un 'amount' dans Accounts correspondant bien à la sommes des 'amout' des Operations.
+Mais aussi une partie "fausse", afin de pouvoir déclencher une requête sur le cluster pour extraires les Accounts posant problème.
+
+Classe FeedDb :
+
+[,java]
+----
+@Path("/ignite/tp2/feedDb")
+@Slf4j
+@RequiredArgsConstructor
+public class FeedDb {
+    public static final BigDecimal _100 = new BigDecimal(100);
+    private final IgniteClient igniteClient;
+    @SuppressWarnings("BigDecimalMethodWithoutRoundingCalled")
+    @GET
+    @Path("/{nbAccounts}/{nbAccountsInError}/{nbOperationsPerAccount}")
+    public Response feedTheDb(@PathParam("nbAccounts") Integer nbAccounts, @PathParam("nbAccountsInError") Integer nbAccountsInError, @PathParam("nbOperationsPerAccount") Integer nbOperationsPerAccount) {
+        ClientCache<AccountKey, Account> accounts = igniteClient.getOrCreateCache("accounts");
+        ClientCache<OperationKey, Operation> operations = igniteClient.getOrCreateCache("operations");
+        log.info("Get caches {} , {}",accounts,operations);
+        for (int index = 0; index < nbAccounts + nbAccountsInError; index++) {
+            AccountKey accountKey = new AccountKey();
+            if (index < nbAccounts)
+                accountKey.setId("GOOD-"+index);
+            else
+                accountKey.setId("BAD-"+index);
+            Account account = new Account();
+            account.setAmount(new BigDecimal(0));
+            for (int indexOp = 0; indexOp < nbOperationsPerAccount; indexOp++) {
+                Operation operation = new Operation();
+                OperationKey operationKey = new OperationKey();
+                operationKey.setAccountId(accountKey.getId());
+                operationKey.setId(UUID.randomUUID().toString());
+                operation.setAmount(new BigDecimal(new Random().nextInt(100000)).divide(_100));
+                if (index < nbAccounts)
+                    account.setAmount(account.getAmount().add(operation.getAmount()));
+                operations.put(operationKey, operation);
+                log.info("Put {}={}",operationKey,operation);
+            }
+            accounts.put(accountKey, account);
+            log.info("Put {}={}",accountKey,account);
+
+        }
+        return Response.ok().build();
+    }
+}
+----
+
+Une fois en place, vous pouvez recharger votre quarkus et appeler la requête HTTP link:src/http-requests/ignite-db/feedDb.http[ici].
+
+Quand l'éxecution est terminée, nous pouvons utiliser Nebula ou votre outil JDBC pour vérifier la présence des données :
+
+[,sql]
+----
+SELECT 'accounts',count(*) FROM ACCOUNTS
+union ALL
+select 'operations', COUNT(*) from OPERATIONS
+----
+
+image::../resources/images/screen2.3.png[img.png]
+
+== Requêtes
+
+Maintenant, nous pouvons exécuter la requête qui utilise le principe de clef d'affinités (colocalisation) :
+
+[,sql]
+----
+select a.id,a.amount, ag.total
+from ACCOUNTS a
+         left join (
+    select accountid,sum(o.amount) total from OPERATIONS o GROUP by o.accountid
+) ag
+                   on a.id=ag.accountid
+where a.amount <> ag.total
+----
+
+Et l'on retrouve bien 5 Account 'problématiques' :  image:../resources/images/screen2.4.png[img.png]
+
+Si nous regardons de nouveau dans Nebula dans l'onglet "Cache", nous pouvons observer la répartition des données :
+image:../resources/images/screen2.5.png[img.png]
+
+== Test du mécanisme de Backup
+
+Si vous définissez des backups, Ignite est résistant aux pannes (jusqu'à une certaine limite).
+
+Pour simuler cela, nos allons stopper une des instances.
+Arrêtez la première que vous avez lancé au début du TP.
+Nous vérifions ainsi qu'en cas de crash, un processus éléctif choisit un autre noeud encore présent comme coordinateur.
+
+Dans le dashboard Nebula, vous pouvez vérifier que nous n'avons plus que 2 nœuds.
+
+Rejouez la requête vu en 2.4 pour constater que le résultat est le même malgré la perte d'un nœud.
