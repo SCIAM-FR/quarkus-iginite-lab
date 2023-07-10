@@ -24,7 +24,7 @@ Une fois ceci en place, vous pourrez remarquer que le projet contient 1 module p
 Chaque module contient un fichier TPx.md qui vous donne la marche à suivre.
 
 Le framework Apache Ignite est très riche en fonctionnalités.
-Le but de cd HOL est de vous donner quelques exemples et envie d'aller plus loin.
+Le but de ce lab est de vous donner quelques exemples et envie d'aller plus loin.
 
 https://tinyurl.com/5eshwjpa
 
