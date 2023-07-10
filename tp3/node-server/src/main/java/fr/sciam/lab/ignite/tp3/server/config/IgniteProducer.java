@@ -1,4 +1,4 @@
-package fr.sciam.lab.ignite.tp3.server;
+package fr.sciam.lab.ignite.tp3.server.config;
 
 import io.quarkus.runtime.configuration.ProfileManager;
 import jakarta.enterprise.context.ApplicationScoped;

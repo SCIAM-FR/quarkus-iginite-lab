@@ -1,4 +1,4 @@
-package fr.sciam.lab.ignite.tp3.server;
+package fr.sciam.lab.ignite.tp3.server.service;
 
 
 import fr.sciam.lab.ignite.tp3.service.MySimpleService;

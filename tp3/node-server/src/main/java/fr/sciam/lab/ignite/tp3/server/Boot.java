@@ -1,6 +1,6 @@
 package fr.sciam.lab.ignite.tp3.server;
 
-import io.quarkus.runtime.Startup;
+import fr.sciam.lab.ignite.tp3.server.service.QuarkusIgniteServiceProxy;
 import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
