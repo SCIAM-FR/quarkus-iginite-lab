@@ -5,6 +5,8 @@
 
 Nous avons un projet qui prépare des serveurs ignite.
 
+TIP: Le projet ignite comporte un fichier `cluster-ignite.md` qui reprend les commandes et étapes ci-dessous pour créer votre cluster ignite.
+
 Pour le déployer, veuillez exécuter :
 
 Pour linux/mac :
