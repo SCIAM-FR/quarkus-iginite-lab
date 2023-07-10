@@ -153,7 +153,7 @@ Pour windows powershell :
 ./mvnw quarkus:dev "-Dquarkus.http.port=8084" "-Ddebug=5006"
 ----
 
-Maintenant, vous pouvez jouer la requête http sur votre 2e instance http://localhost:8085/ignite/testconnect
+Maintenant, vous pouvez jouer la requête http sur votre 2e instance http://localhost:8084/ignite/testconnect
 
 
 Dans les logs des serveurs, vous verrez les compteurs s'incrémenter sur les deux nœuds.
@@ -179,4 +179,4 @@ ClientCache<Integer, String> cache = client.cache("myCache");
 ----
 
 Créez-vous un service REST pour ajouter des données à un cache et un autre pour les lire.
-Servez vous de la Swagger UI pour tester vos services (http://localhost:8081/q/dev-ui/io.quarkus.quarkus-smallrye-openapi/swagger-ui) (http://localhost:8085/q/dev-ui/io.quarkus.quarkus-smallrye-openapi/swagger-ui)
+Servez vous de la Swagger UI pour tester vos services (http://localhost:8083/q/dev-ui/io.quarkus.quarkus-smallrye-openapi/swagger-ui) (http://localhost:8084/q/dev-ui/io.quarkus.quarkus-smallrye-openapi/swagger-ui)
