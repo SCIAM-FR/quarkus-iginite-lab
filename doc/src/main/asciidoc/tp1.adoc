@@ -58,7 +58,7 @@ image:../resources/images/screen4.png[img.png] image:../resources/images/screen5
 *Attention* le token d'enregistrement n'est valide que 5 minutes !
 
 Apache ignite fournis en standard une api REST, nous allons l'utiliser pour vérifier le fonctionnement du cluster.
-Il y a un fichier contenant l'URL ci-dessous link:src/http-requests/ignite-rest/get-version.http[ici] si votre IDE permet de l'exécuter, sinon :
+le fichier suivant link:src/http-requests/ignite-rest/get-version.http[ici] contient la requête à exécuter :
 
 [,http request]
 ----
@@ -93,6 +93,10 @@ public class IgniteClientProducer {
         ClientConfiguration cfg = new ClientConfiguration().setAddresses("127.0.0.1:10800");
         return Ignition.startClient(cfg);
     }
+
+    public void disposeIgniteClient(@Disposes IgniteClient igniteClient) {
+        igniteClient.close();
+    }
 }
 ----
 
@@ -113,9 +117,6 @@ public class ConnectToIgniteCluster {
         long counter = hitCounter.incrementAndGet();
         log.info("Current hit {}", counter);
         return Response.ok("{ Hit : \"" + counter + "\"}").build();
-    }
-    public void disposeIgniteClient(@Disposes IgniteClient igniteClient) {
-        igniteClient.close();
     }
 }
 ----
