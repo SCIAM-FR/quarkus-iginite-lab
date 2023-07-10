@@ -1,6 +1,6 @@
 = Bienvenue dans ce lab Quarkus Ignite
 
-Ce repository contient les éléments suivants:
+Ce repository contient les éléments suivants :
 
 * La documentation du lab dans le répertoire `doc` pour la générer il suffit de lancer la commande `mvnw` dans le répertoire doc depuis votre terminal. La documentation sera générée dans le répertoire `target/generated-docs`
 
@@ -11,4 +11,4 @@ TIP: la documentation est aussi disponible dans les livrables du repository gith
 ** Un projet ignite permettant de créer un cluster dans le répertoire `ignite`
 ** Une série de 3 TP dans les répertoires `tp1-2` et `tp3` permettant de réaliser le lab
 
-Merci de vous référez à la doculentation pour plus d'informations sur le lab.
+Merci de vous référer à la documentation pour plus d'informations sur le lab.
