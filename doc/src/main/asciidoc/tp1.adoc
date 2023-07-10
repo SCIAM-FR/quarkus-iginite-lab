@@ -46,7 +46,7 @@ Pour windows powershell :
 $env:OPTION_LIBS = 'ignite-rest-http,ignite-calcite'
 $env:CONFIG_URI = 'file://config/node-configuration.xml'
 $env:JVM_OPTS = '-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDirectMemorySize=256m'
-../ignite\target\apache-ignite-2.14.0-bin/bin/ignite.bat
+./target/apache-ignite-2.14.0-bin/bin/ignite.bat
 ----
 
 Dans les logs d'un des nœuds, vous trouverez l'URL pour brancher un outil de monitoring fourni pas Gridgain :  image:../resources/images/screen3.png[img.png]
