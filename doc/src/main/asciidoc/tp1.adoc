@@ -130,7 +130,8 @@ Vérifions le fonctionnement :
 ./mvnw quarkus:dev
 ----
 
-Puis une fois démarré, lancer plusieurs fois la requête http link:src/http-requests/java-client/test-igniteclientconnectionapi.http[ici] et vérifiez dans les logs ce qu'il se passe.
+Puis une fois démarré, lancer plusieurs fois la requête http http://localhost:8083/ignite/testconnect
+ et vérifiez dans les logs ce qu'il se passe.
 
 == Déploiement d'une deuxième instance du service
 
@@ -152,7 +153,8 @@ Pour windows powershell :
 ./mvnw quarkus:dev "-Dquarkus.http.port=8084" "-Ddebug=5006"
 ----
 
-Maintenant, vous pouvez jouer la requête http sur votre 2e instance link:src/http-requests/java-client/test-igniteclientconnectionapi2.http[ici]
+Maintenant, vous pouvez jouer la requête http sur votre 2e instance http://localhost:8085/ignite/testconnect
+
 
 Dans les logs des serveurs, vous verrez les compteurs s'incrémenter sur les deux nœuds.
 
