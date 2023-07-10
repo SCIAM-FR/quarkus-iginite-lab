@@ -53,6 +53,13 @@ Cotés client seul une ligne supplémentaire indique que l'on démarre en "clien
 igniteConfiguration.setClientMode(true);
 ----
 
+Avant tout, compilons les modules :
+[,shell]
+----
+./mvnw clean install
+----
+
+
 Nous pouvons maintenant lancer nos 3 micro-services (dans 3 terminaux différents, sur Intellij, vous pouvez exécuter les commandes suivantes directement depuis votre IDE)
 
 *Sur Mac/Linux*
