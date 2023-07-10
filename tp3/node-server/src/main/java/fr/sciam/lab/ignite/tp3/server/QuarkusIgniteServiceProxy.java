@@ -6,4 +6,8 @@ import org.apache.ignite.services.Service;
 
 public class QuarkusIgniteServiceProxy implements Service, MySimpleService {
 
+    @Override
+    public Integer add(Integer a, Integer b) {
+        return null;
+    }
 }
