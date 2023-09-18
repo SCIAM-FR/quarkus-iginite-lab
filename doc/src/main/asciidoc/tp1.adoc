@@ -1,36 +1,35 @@
-= TP1 : découverte d'apache ignite avec Quarkus en pure client
-:data-uri:
+= Lab Exercise 1: Discovering Apache Ignite with Quarkus as a Pure Client
 
-== Déploiement de 3 nodes Ignite serveur
+== Deploying 3 Ignite Server Nodes
 
-Nous avons un projet qui prépare des serveurs ignite.
+We have a project that prepares Ignite servers.
 
-TIP: Le projet ignite comporte un fichier `cluster-ignite.md` qui reprend les commandes et étapes ci-dessous pour créer votre cluster ignite.
+TIP: The Ignite project includes a `cluster-ignite.md` file that contains the following commands and steps to create your Ignite cluster.
 
-Pour le déployer, veuillez exécuter :
+To deploy it, please execute:
 
-Pour linux/mac :
+For Linux/Mac:
 
-[,shell]
+[source,shell]
 ----
 cd ../ignite
 ./mvnw clean install
 chmod +x ./target/apache-ignite-2.14.0-bin/bin/ignite.sh
 ----
 
-Pour windows :
+For Windows:
 
-[,shell]
+[source,shell]
 ----
 cd ../ignite
 ./mvnw.cmd clean install
 ----
 
-Une fois la préparation faite, nous pouvons lancer 3 fois les commandes suivantes (une fois par terminal)
+Once the preparation is done, we can run the following commands three times (once per terminal):
 
-Pour linux/mac :
+For Linux/Mac:
 
-[,shell]
+[source,shell]
 ----
 cd ../ignite/target/apache-ignite-2.14.0-bin
 export OPTION_LIBS=ignite-rest-http,ignite-calcite
@@ -39,9 +38,9 @@ export JVM_OPTS="-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDire
 ./bin/ignite.sh
 ----
 
-Pour windows powershell :
+For Windows PowerShell:
 
-[,shell]
+[source,shell]
 ----
 $env:OPTION_LIBS = 'ignite-rest-http,ignite-calcite'
 $env:CONFIG_URI = 'file://config/node-configuration.xml'
@@ -49,40 +48,35 @@ $env:JVM_OPTS = '-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDire
 ./target/apache-ignite-2.14.0-bin/bin/ignite.bat
 ----
 
-Dans les logs d'un des nœuds, vous trouverez l'URL pour brancher un outil de monitoring fourni pas Gridgain :  image:../resources/images/screen3.png[img.png]
+In the logs of one of the nodes, you will find the URL to connect a monitoring tool provided by GridGain: image:../resources/images/screen3.png[img.png]
 
-Copiez-collez cette URL dans votre navigateur préféré et inscrivez-vous (gratuitement).
-Vous pourrez alors explorer votre cluster.
-Nous utiliserons Nebula par la suite.
+Copy and paste this URL into your favorite browser and sign up (for free). You can then explore your cluster. We will use Nebula later.
 
 image:../resources/images/screen4.png[img.png] image:../resources/images/screen5.png[img.png]
 
-*Attention* le token d'enregistrement n'est valide que 5 minutes !
+*Attention:* The registration token is only valid for 5 minutes!
 
-Apache ignite fournis en standard une api REST, nous allons l'utiliser pour vérifier le fonctionnement du cluster.
-le fichier suivant link:src/http-requests/ignite-rest/get-version.http[ici] contient la requête à exécuter :
+Apache Ignite provides a standard REST API, which we will use to check the cluster's operation. The following file, link:src/http-requests/ignite-rest/get-version.http[here], contains the request to execute:
 
 [,http request]
 ----
 http://localhost:8080/ignite?cmd=version
 ----
 
-== Création rapide d'un client Quarkus
+== Quick Creation of a Quarkus Client
 
-Vous avez certainement noté que les services Rest Ignite écoutent sur le port 8080.
-Nous allons devoir indiquer à quarkus d'utiliser un autre port.
+You may have noticed that Ignite REST services listen on port 8080. We need to tell Quarkus to use a different port.
 
-Dans le fichier application.properties des resources, ajoutez la propriété suivante :
+In the application.properties file in the resources, add the following property:
 
 [,properties]
 ----
 quarkus.http.port=8083
 ----
 
-Passons maintenant au client.
-Ajoutez un Producer qui va créer l'instance de l'objet IgniteClient :
+Let's move on to the client. Add a Producer that will create an instance of the IgniteClient object:
 
-[,java]
+[source,java]
 ----
 @ApplicationScoped
 @RequiredArgsConstructor
@@ -102,9 +96,9 @@ public class IgniteClientProducer {
 }
 ----
 
-Puis créez un service REST qui va se connecter, récupérer un compteur atomic et l'incrémenter à chaque appel.
+Then create a REST service that will connect, retrieve an atomic counter, and increment it with each call:
 
-[,java]
+[source,java]
 ----
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/ignite/testconnect")
@@ -123,60 +117,54 @@ public class ConnectToIgniteCluster {
 }
 ----
 
-Vérifions le fonctionnement :
+Let's check the operation:
 
-[,shell]
+[source,shell]
 ----
 ./mvnw quarkus:dev
 ----
 
-Puis une fois démarré, lancer plusieurs fois la requête http http://localhost:8083/ignite/testconnect
- et vérifiez dans les logs ce qu'il se passe.
+Then, once it's started, make several HTTP requests to http://localhost:8083/ignite/testconnect and check the logs to see what happens.
 
-== Déploiement d'une deuxième instance du service
+== Deploying a Second Instance of the Service
 
-Mais, comment être sûr que le compteur n'est pas local ?
+But how can we be sure that the counter isn't local? Well, we will use a second instance!
 
-Eh bien, nous allons utiliser une deuxième instance !
+For Linux/Mac:
 
-Pour linux/mac :
-
-[,shell]
+[source,shell]
 ----
 ./mvnw quarkus:dev -Dquarkus.http.port=8084 -Ddebug=5006
 ----
 
-Pour windows powershell :
+For Windows PowerShell:
 
-[,shell]
+[source,shell]
 ----
 ./mvnw quarkus:dev "-Dquarkus.http.port=8084" "-Ddebug=5006"
 ----
 
-Maintenant, vous pouvez jouer la requête http sur votre 2e instance http://localhost:8084/ignite/testconnect
+Now you can make the HTTP request on your second instance at http://localhost:8084/ignite/testconnect.
 
+In the server logs, you will see the counters incrementing on both nodes.
 
-Dans les logs des serveurs, vous verrez les compteurs s'incrémenter sur les deux nœuds.
+== Explore Other Possibilities
 
-== Explorez d'autres possibilités
-
-Le client Java Thin fourni une API riche et permet d'utiliser la majorité des fonctionnalités d'apache Ignite.
+The Apache Ignite Thin Java client provides a rich API that allows you to use most of Apache Ignite's features.
 
 image::../resources/images/screen6.png[img.png]
 
-Vous pouvez voir les détails dans la documentation officielle d'Apache Ignite https://ignite.apache.org/docs/latest/thin-clients/java-thin-client[ici].
+You can see the details in the official Apache Ignite documentation here: https://ignite.apache.org/docs/latest/thin-clients/java-thin-client
 
-Les principales différences se situent au niveau des possibilités des services, qui dans le cas du client thin, doivent être déjà déployés sur le serveur, contrairement aux autres modes permettant le peer classloading.
-Les clients thin n'hébergent pas de donnée non plus, exception faite des near caches.
+The main differences are in the capabilities of services, which, in the case of the thin client, must already be deployed on the server, unlike other modes that allow peer class loading. Thin clients also do not host data, except for near caches.
 
-=== Les caches  (https://ignite.apache.org/docs/latest/key-value-api/basic-cache-operations)
+=== Caches (https://ignite.apache.org/docs/latest/key-value-api/basic-cache-operations)
 
-En vous servant de l'api cache coté client (https://ignite.apache.org/docs/latest/thin-clients/java-thin-client)
+Using the client-side cache API (https://ignite.apache.org/docs/latest/thin-clients/java-thin-client)
 
-[,java]
+[source,java]
 ----
 ClientCache<Integer, String> cache = client.cache("myCache");
 ----
 
-Créez-vous un service REST pour ajouter des données à un cache et un autre pour les lire.
-Servez vous de la Swagger UI pour tester vos services (http://localhost:8083/q/dev-ui/io.quarkus.quarkus-smallrye-openapi/swagger-ui) (http://localhost:8084/q/dev-ui/io.quarkus.quarkus-smallrye-openapi/swagger-ui)
+Create a REST service to add data to a cache and another to read it. Use the Swagger UI to test your services (http://localhost:8083/q/dev-ui/io.quarkus.quarkus-smallrye-openapi/swagger-ui) (http://localhost:8084/q/dev-ui/io.quarkus.quarkus-smallrye-openapi/swagger-ui)

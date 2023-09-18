@@ -2,29 +2,27 @@
 :author: Yann Blazart, Pierre Cesmat, Antoine Sabot-Durand
 :email: yann.blazart@sciam.fr
 :revnumber: 1.0
-:revdate: 10 Juillet 2023
+:revdate: September 14 2023
 :doctype: book
 
 
-== Bienvenue dans notre Hands-on-lab sur Ignite et Quarkus !
+== Welcome in the Quarkus Ignite Hands-on-lab !
 
-=== Pré-requis
+=== Prerequisites
 
-Assurez-vous de disposer :
+* Guthub account
+* Jdk 11
+* Maven 3.9.1+
+* Your preferred IDE, with annotation processing (Lombok)
+* Register the free subscription for the Nebula tool of gridgain : https://portal.gridgain.com/auth/signin[here]
 
-* d'un compte GtiHub
-* d'un jdk 11
-* de maven 3.9.1+
-* de votre IDE preféré que vous maîtrisez, avec l'annotation processing activé (Lombok)
-* Inscrivez-vous gratuitement sur l'outil Nebula de Gridgain https://portal.gridgain.com/auth/signin[ici], cet outil nous permettera de monitorer nos clusters.
+=== Getting started
 
-=== Démarrage
+Once this is in place, you will notice that the project contains 1 module per lab exercise.
+Each module contains a TPx.md file that provides you with the steps to follow.
 
-Une fois ceci en place, vous pourrez remarquer que le projet contient 1 module par TP.
-Chaque module contient un fichier TPx.md qui vous donne la marche à suivre.
-
-Le framework Apache Ignite est très riche en fonctionnalités.
-Le but de ce lab est de vous donner quelques exemples et envie d'aller plus loin.
+The Apache Ignite framework is very rich in features.
+The purpose of this lab is to provide you with some examples and encourage you to explore further.
 
 https://tinyurl.com/5eshwjpa
 
