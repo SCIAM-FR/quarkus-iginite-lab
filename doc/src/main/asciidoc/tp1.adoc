@@ -6,13 +6,13 @@ We have a project that prepares Ignite servers.
 
 TIP: The Ignite project includes a `cluster-ignite.md` file that contains the following commands and steps to create your Ignite cluster.
 
-To deploy it, please execute:
+To deploy it, please execute from project root:
 
 For Linux/Mac:
 
 [source,shell]
 ----
-cd ../ignite
+cd ignite
 ./mvnw clean install
 chmod +x ./target/apache-ignite-2.14.0-bin/bin/ignite.sh
 ----
@@ -21,17 +21,17 @@ For Windows:
 
 [source,shell]
 ----
-cd ../ignite
+cd ignite
 ./mvnw.cmd clean install
 ----
 
 Once the preparation is done, we can run the following commands three times (once per terminal):
 
-For Linux/Mac:
+For Linux/Mac from ignite module root:
 
 [source,shell]
 ----
-cd ../ignite/target/apache-ignite-2.14.0-bin
+cd ./target/apache-ignite-2.14.0-bin
 export OPTION_LIBS=ignite-rest-http,ignite-calcite
 export CONFIG_URI=file://config/node-configuration.xml
 export JVM_OPTS="-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDirectMemorySize=256m"
