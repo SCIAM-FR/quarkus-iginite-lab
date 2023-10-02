@@ -1,0 +1,10 @@
+image:
+  file: .gitpod.Dockerfile
+
+tasks:
+  - name: Install Java 17
+    init: sdk install java 17.0.8-oracle < /dev/null
+
+vscode:
+    extensions:
+        - vscjava.vscode-java-pack
