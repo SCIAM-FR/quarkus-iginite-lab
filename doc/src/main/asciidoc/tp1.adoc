@@ -1,5 +1,9 @@
 = TP1 Lab Exercise 1: Discovering Apache Ignite with Quarkus as a Pure Client
 
+== Prerequesite
+
+Do a mvn clean install at the project root
+
 == Deploying 3 Ignite Server Nodes
 
 We have a project that prepares Ignite servers.
