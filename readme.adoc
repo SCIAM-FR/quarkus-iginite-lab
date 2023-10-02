@@ -1,19 +1,17 @@
-= Bienvenue dans ce lab Quarkus Ignite
+= Welcome to the Quarkus Ignite Lab
 
-Ce repository contient les éléments suivants :
+This repository contains the following elements:
 
-* La documentation du lab dans le répertoire `doc` pour la générer il suffit de lancer la commande `mvnw` dans le répertoire doc depuis votre terminal. La documentation sera générée dans le répertoire `target/generated-docs`
+* Lab documentation in the `doc` directory. To generate it, simply run the `mvnw` command in the doc directory from your terminal. The documentation will be generated in `target/generated-docs`.
 
-TIP: la documentation est aussi disponible dans les livrables du repository github à l'adresse : https://github.com/SCIAM-FR/quarkus-iginite-lab
+TIP: The documentation is also available in the GitHub repository deliverables at: https://github.com/SCIAM-FR/quarkus-iginite-lab
 
-* Les éléments pour effectuer le lab sous forme de :
-
+*Materials for completing the lab in the form of:
 Please refer to the documentation for more information about the lab.
-## Opening the workspace in GitPod
 
+## Opening the Workspace in GitPod
 To open the workspace, simply click on the *Open in Gitpod* button, or use https://gitpod.io/#https://github.com/SCIAM-FR/quarkus-iginite-lab.git.
-
 
 image::https://gitpod.io/button/open-in-gitpod.svg[link=https://gitpod.io/#https://github.com/SCIAM-FR/quarkus-iginite-lab.git]
 
-Big Thanks to Horacio https://twitter.com/LostInBrittany[@LostInBrittany] for his help with Gitpod !
+Big Thanks to Horacio https://twitter.com/LostInBrittany[@LostInBrittany] for his help with Gitpod!
