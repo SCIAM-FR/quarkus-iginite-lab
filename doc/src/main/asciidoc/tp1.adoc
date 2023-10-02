@@ -15,7 +15,6 @@ For Linux/Mac:
 [source,shell]
 ----
 cd ignite
-./mvnw clean install
 chmod +x ./target/apache-ignite-2.14.0-bin/bin/ignite.sh
 ----
 
@@ -24,7 +23,6 @@ For Windows:
 [source,shell]
 ----
 cd ignite
-./mvnw.cmd clean install
 ----
 
 Once the preparation is done, we can run the following commands #three times# (once per terminal):
