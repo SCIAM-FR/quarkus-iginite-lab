@@ -1,18 +1,18 @@
 = Lab Exercise 2: Apache Ignite, a Distributed Database
 
-== If You Haven't Completed TP1
+== #If You Haven't Completed TP1#
 
 === Deploying 3 Ignite Server Nodes
 
 We have a project that prepares Ignite servers.
 
-To deploy it, please execute:
+To deploy it, please execute from project root:
 
 For Linux/Mac:
 
 [,shell]
 ----
-cd ../ignite
+cd ignite
 ./mvnw clean install
 chmod +x ./target/apache-ignite-2.14.0-bin/bin/ignite.sh
 ----
@@ -21,7 +21,7 @@ For Windows:
 
 [,shell]
 ----
-cd ../ignite
+cd ignite
 ./mvnw.cmd clean install
 ----
 
@@ -31,7 +31,7 @@ For Linux/Mac:
 
 [,shell]
 ----
-cd ../ignite/target/apache-ignite-2.14.0-bin
+cd ./target/apache-ignite-2.14.0-bin
 export OPTION_LIBS=ignite-rest-http,ignite-calcite
 export CONFIG_URI=file://config/node-configuration.xml
 export JVM_OPTS="-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDirectMemorySize=256m   --add-opens java.base/java.lang.invoke=ALL-UNNAMED "
@@ -45,7 +45,7 @@ For Windows PowerShell:
 $env:OPTION_LIBS = 'ignite-rest-http,ignite-calcite'
 $env:CONFIG_URI = 'file://config/node-configuration.xml'
 $env:JVM_OPTS = '-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDirectMemorySize=256m'
-../ignite\target\apache-ignite-2.14.0-bin/bin/ignite.bat
+.\target\apache-ignite-2.14.0-bin/bin/ignite.bat
 ----
 
 In the logs of one of the nodes, you will find the URL to connect a monitoring tool provided by Gridgain: image:../resources/images/screen3.png[img.png]

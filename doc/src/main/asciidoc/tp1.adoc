@@ -1,10 +1,8 @@
-= Lab Exercise 1: Discovering Apache Ignite with Quarkus as a Pure Client
+= TP1 Lab Exercise 1: Discovering Apache Ignite with Quarkus as a Pure Client
 
 == Deploying 3 Ignite Server Nodes
 
 We have a project that prepares Ignite servers.
-
-TIP: The Ignite project includes a `cluster-ignite.md` file that contains the following commands and steps to create your Ignite cluster.
 
 To deploy it, please execute from project root:
 
@@ -25,7 +23,7 @@ cd ignite
 ./mvnw.cmd clean install
 ----
 
-Once the preparation is done, we can run the following commands three times (once per terminal):
+Once the preparation is done, we can run the following commands #three times# (once per terminal):
 
 For Linux/Mac from ignite module root:
 
@@ -64,6 +62,13 @@ http://localhost:8080/ignite?cmd=version
 ----
 
 == Quick Creation of a Quarkus Client
+
+Now with your terminal go to tp1-2 module
+
+[source,shell]
+----
+cd ../tp1-2
+----
 
 You may have noticed that Ignite REST services listen on port 8080. We need to tell Quarkus to use a different port.
 
