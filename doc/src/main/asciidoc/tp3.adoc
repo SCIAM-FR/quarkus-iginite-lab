@@ -1,68 +1,64 @@
-= TP3 : Apache ignite, embarqué dans Quarkus
+= Lab Exercise 3: Apache Ignite, embedded in Quarkus
 
-== Pourquoi ?
+== Why?
 
-Nous avons précédemment vu qu'il était assez simple de pouvoir utiliser le thin client Java pour accéder à Ignite.
-Mais ce mode de connexion présente quelques limitations :
+We have previously seen that it is quite simple to use the Java thin client to access Ignite. However, this connection mode has some limitations:
 
-* Les possibilités techniques sont moindres :
-** Les services ignite que l'on veut appeler doivent déjà être déployés sur les nœuds serveurs d'ignite.
-** Le client ne peut pas réellement recevoir d'évènements ou fournir un service supplémentaire à la grille.
-** Le DataStreamer qui permet une alimentation rapide des données n'est pas disponible en Thin Client.
-* Il impose de traiter les serveurs Ignite comme étant des produits sur étagère.
-Ce qui dans certaines structures complexifie les procédures de livraison et d'exploitation.
+* Fewer technical possibilities:
+** The Ignite services we want to call must already be deployed on the Ignite server nodes.
+** The client cannot really receive events or provide additional services to the grid.
+** The DataStreamer, which allows for fast data feeding, is not available in the Thin Client.
+* It forces us to treat Ignite servers as off-the-shelf products. This complicates delivery and operation procedures in some complex structures.
 
-Un nœud Ignite peut être paramétré en "client mode", de ce fait, il n'hébergera pas de données (exception des near cache) mais pourra "apporter" ses services à la grille.
+An Ignite node can be configured in "client mode", meaning it will not host data (except for near cache) but can "contribute" its services to the grid.
 
-Nous ne pouvons dans ce TP, avec le temps imparti, explorer toutes les possibilités du framework.
-C'est pourquoi nous avons choisi de vous en faire découvrir certaines qui selon nous sont utiles dans une architecture orientée micro service avec Quarkus.
+In this TP, given the limited time available, we cannot explore all the possibilities of the framework. That's why we have chosen to introduce you to some aspects that, in our opinion, are useful in a microservice-oriented architecture with Quarkus.
 
-== Présentation des modules.
+== Presentation of the modules.
 
-Dans le TP3, nous avons 3 sous modules :
+In TP3, we have 3 submodules:
 
-* node-client : qui contient le code du micro-service quarkus qui va rejoindre le cluster en mode "client"
-* node-server : qui contient le code du micro-service quarkus qui va rejoindre le cluster en mode "serveur"
-** nous lancerons 2 instances de ce micro-service
-* node-service : module qui nous permet de partager des interfaces et modèles communs entre "client" et "server"
+* node-client: contains the Quarkus microservice code that will join the cluster in "client" mode.
+* node-server: contains the Quarkus microservice code that will join the cluster in "server" mode.
+** We will launch 2 instances of this microservice.
+* node-service: a module that allows us to share common interfaces and models between "client" and "server."
 
-Dans les modules client et server, les classes de Boot et IgniteProducer sont déjà prêtes à l'emploi.
-Par rapport aux TP1 et TP2 outre le fait que nous produisons une instance 'Ignite' et non'IgniteClient',  vous verrez quelques différences de configuration :
+In the client and server modules, the Boot and IgniteProducer classes are already ready to use. In addition to TP1 and TP2, besides the fact that we produce an 'Ignite' instance instead of 'IgniteClient', you will see some configuration differences:
 
 [,java]
 ----
-igniteConfiguration.setUserAttributes(Map.of("nodeType","server"));
+igniteConfiguration.setUserAttributes(Map.of("nodeType", "server"));
 igniteConfiguration.setClassLoader(Thread.currentThread().getContextClassLoader());
 igniteConfiguration.setPeerClassLoadingEnabled(true);
 ----
 
-* On peut donner des attributs aux nœuds, ce qui sera utile pour séléctionner sur quels nœuds nous voulons exécuter nos actions (on peut par exemple imaginer certains nœuds dédiés à certains types de traitements)
-* Il vaut mieux spécifier le classloader
-* Et enfin on autorise le remote class loading.
+* We can assign attributes to nodes, which will be useful for selecting on which nodes we want to execute our actions (for example, we can imagine certain nodes dedicated to certain types of processing).
+* It's better to specify the classloader.
+* And finally, we enable remote class loading.
 
-Nous devons ajouter un *add-opens* sur les invoke pour java 11 (dans la ligne de lancement du jar, voir la propriété jvm.args du pom.xml root link:../pom.xml[ici]):
+We need to add an *add-opens* for invoke in Java 11 (in the jar launch line, see the jvm.args property in the root pom.xml link:[here]):
 
 ----
 add --add-opens java.base/java.lang.invoke=ALL-UNNAMED
 ----
 
-Cotés client seul une ligne supplémentaire indique que l'on démarre en "client mode" :
+On the client side, only one additional line indicates that we are starting in "client mode":
 
 [,java]
 ----
 igniteConfiguration.setClientMode(true);
 ----
 
-Avant tout, compilons les modules :
+First of all, let's compile the modules:
+
 [,shell]
 ----
 ./mvnw clean install
 ----
 
+Now we can start our 3 microservices (in 3 different terminals, in IntelliJ, you can run the following commands directly from your IDE).
 
-Nous pouvons maintenant lancer nos 3 micro-services (dans 3 terminaux différents, sur Intellij, vous pouvez exécuter les commandes suivantes directement depuis votre IDE)
-
-*Sur Mac/Linux*
+* On Mac/Linux
 
 [,shell]
 ----
@@ -71,15 +67,15 @@ Nous pouvons maintenant lancer nos 3 micro-services (dans 3 terminaux différent
 
 [,shell]
 ----
-./mvnw -pl node-server quarkus:dev  -Dnode.name=serverNode2 -Dquarkus.http.port=8082 -Ddebug=5007
+./mvnw -pl node-server quarkus:dev -Dnode.name=serverNode2 -Dquarkus.http.port=8082 -Ddebug=5007
 ----
 
 [,shell]
 ----
-./mvnw -pl node-client quarkus:dev  -Dnode.name=clientNode1 -Dquarkus.http.port=8085 -Ddebug=5010
+./mvnw -pl node-client quarkus:dev -Dnode.name=clientNode1 -Dquarkus.http.port=8085 -Ddebug=5010
 ----
 
-*Sur Windows*
+* On Windows
 
 [,shell]
 ----
@@ -88,24 +84,24 @@ Nous pouvons maintenant lancer nos 3 micro-services (dans 3 terminaux différent
 
 [,shell]
 ----
-./mvnw -pl node-server quarkus:dev  "-Dnode.name=serverNode2" "-Dquarkus.http.port=8082" "-Ddebug=5007"
+./mvnw -pl node-server quarkus:dev "-Dnode.name=serverNode2" "-Dquarkus.http.port=8082" "-Ddebug=5007"
 ----
 
 [,shell]
 ----
-./mvnw -pl node-client quarkus:dev  "-Dnode.name=clientNode1" "-Dquarkus.http.port=8085" "-Ddebug=5010"
+./mvnw -pl node-client quarkus:dev "-Dnode.name=clientNode1" "-Dquarkus.http.port=8085" "-Ddebug=5010"
 ----
 
-Dans les logs d'un des serveurs vous verrez que le cluster est composé de 2 serveurs et 1 client (pas thin) :
+In the logs of one of the servers, you will see that the cluster consists of 2 servers and 1 client (not thin):
 
 [,shell]
 ----
-Metrics for local node (to disable set 'metricsLogFrequency' to 0)
+Metrics for the local node (to disable set 'metricsLogFrequency' to 0)
     ^-- Node [id=fc17aee8, uptime=03:10:09.579]
     ^-- Cluster [hosts=1, CPUs=12, servers=2, clients=1, topVer=19, minorTopVer=0]
 ----
 
-Les swagger ui sont accessible ici :
+The Swagger UIs are accessible here:
 
 * (http://localhost:8080/q/dev-ui/io.quarkus.quarkus-smallrye-openapi/swagger-ui)
 * (http://localhost:8082/q/dev-ui/io.quarkus.quarkus-smallrye-openapi/swagger-ui)
@@ -113,39 +109,34 @@ Les swagger ui sont accessible ici :
 
 == Distributed Computing (https://ignite.apache.org/docs/latest/distributed-computing/distributed-computing)
 
-Cette partie de l'api permet d'envoyer du code à exécuter sur les nœuds distants.
+This part of the API allows you to send code to execute on remote nodes. Very powerful, you can:
 
-Très puissant, vous pouvez :
+* Send code to execute on all nodes or according to a selection.
+* Take advantage of load balancing and/or failover mechanisms.
+* Decide the scheduling of sent tasks (FIFO, by priority, by load distribution).
 
-* envoyer du code à exécuter à tous les nœuds, ou selon une sélection.
-* profiter du mécanisme de load balancing et/ou de failover.
-* Décider du scheduling des tâches envoyées (Fifo, par priorité, par repartition de charge).
+The code in question is serialized so that it supports specific Ignite annotations (https://ignite.apache.org/docs/2.11.1/resources-injection#pre-defined-resources), even with Quarkus.
 
-Le code en question est sérialisé pour qu'il supporte les annotations spécifiques Ignite (https://ignite.apache.org/docs/2.11.1/resources-injection#pre-defined-resources), même avec Quarkus.
-
-Pour appeler des services "Pure Quarkus", dont les classes sont "managées", nous vous conseillons d'utiliser le code suivant dans votre IgniteClosure (ou IgniteCallable ou IgniteRunner) :
+To call "Pure Quarkus" services, whose classes are "managed," we recommend using the following code in your IgniteClosure (or IgniteCallable or IgniteRunner):
 
 [,java]
 ----
 CDI.current().select(MyService.class).get().....
 ----
 
-Faites aussi très attention aux class Anonymes qui lors de la sérialisation tirent avec elle toute la grappe des classes parentes.
-Cela peut parfois apporter quelques désagréments lors de la déserialisation.
+Also, be very careful with Anonymous classes, which, during serialization, carry the entire cluster of parent classes with them. This can sometimes cause issues during deserialization.
 
-=== Envoyer du code à tous les nœuds sélectionnés.
+=== Sending code to all selected nodes.
 
 ____
-ATTENTION : le code envoyé sur un nœud distant sera exécuté dans un Thread d'Apache Ignite.
-Si vous souhaitez utiliser un service Quarkus, il sera peut-être nécessaire d'employer l'annotation @ContextActivator sur celui-ci.
+CAUTION: The code sent to a remote node will be executed in an Apache Ignite thread. If you want to use a Quarkus service, it may be necessary to use the @ContextActivator annotation on it.
 ____
 
-*Créez un service Rest dans le node-client qui s'injecte une instance d'Ignite nous allons nous en servir*
+*Create a REST service in the node-client that injects an Ignite instance; we will use it.*
 
-Imaginons que nous souhaitons exécuter une tâche sur tous les nœuds de type server, par exemple vider des caches, compresser des répertoires, etc.
-L'API compute d'ignite nous permet d'envoyer du code aux nœuds choisis.
+Let's say we want to execute a task on all server-type nodes, such as clearing caches, compressing directories, etc. The Ignite compute API allows us to send code to the chosen nodes.
 
-Pour se faire, nous utilisons la classe *IgniteCompute* et sa méthode *broadcast()*.
+To do this, we use the *IgniteCompute* class and its *broadcast()* method.
 
 [,java]
 ----
@@ -165,10 +156,9 @@ public class ExerciceRest_3_3 {
 }
 ----
 
-(la variable 'ignite' étant injecté par Quarkus, l'instance est créée par le Producer).
+(the 'ignite' variable is injected by Quarkus; the instance is created by the Producer).
 
-Mais avant, la méthode compute soit s'adresse à l'ensemble du cluster, y compris les nœuds en mode client, soit elle peut avoir en paramètre un ClusterGroup qui sélectionne les nœuds cibles.
-Pour décrire un ClusterGroup, il suffit d'utiliser :
+However, before the compute method addresses the entire cluster, including client-mode nodes, it can take a ClusterGroup as a parameter that selects the target nodes. To describe a ClusterGroup, simply use:
 
 [,java]
 ----
@@ -176,19 +166,19 @@ ignite.cluster().forXXXX ....
 ----
 
 ____
-Prenez le temps d'explorer les différentes méthodes 'for...' vous verrez qu'il est possible de sélectionner très finement sur quels nœuds on veut agir.
+Take the time to explore the various 'for...' methods; you will see that it is possible to finely select which nodes to act on.
 ____
 
-Par exemple, pour sélectionner les nœuds serveurs, soit on se base sur l'attribut vu plus haut :
+For example, to select server nodes based on the attribute mentioned earlier:
 
 [,java]
 ----
- ignite.compute(
+ignite.compute(
                 ignite.cluster().forAttribute("nodeType", "server")
         ).broadcast(.....)
 ----
 
-Ou alors, il existe directement une méthode (plus sûre) :
+Alternatively, there is a direct (safer) method:
 
 [,java]
 ----
@@ -197,9 +187,7 @@ ignite.compute(
         ).broadcast(.....
 ----
 
-'''
-
-*Utilisez le code suivant dans une méthode du service Rest que vous avez créé dans node-client puis testez-le en utilisant le Swagger UI, vous verrez alors votre message dans les logs de tous les server*
+*Use the following code in a method of the REST service you created in node-client, then test it using the Swagger UI; you will see your message in the logs of all servers.*
 
 [,java]
 ----
@@ -213,27 +201,19 @@ public Response helloWorldBroadcast() {
 }
 ----
 
-*broadcast()* prend en paramètre des classes héritant de IgniteRunnable, IgniteCallable, IgniteClosure (Function).
+*broadcast()* takes classes inheriting from IgniteRunnable, IgniteCallable, or IgniteClosure (Function) as parameters.
 
-Vous avez bien sûr remarqué que ce code utilise le remote class loading.
+You have probably noticed that this code uses remote class loading.
 
-'''
+*Replace 'broadcast' with 'run,' then press F5 on the client's Swagger UI (with Quarkus, this is enough to recompile/deploy your app), and you will see that when you call your REST service, only one node receives the message.*
 
-*Remplacez 'broadcast' par 'run' puis faite F5 sur la Swagger UI du client (avec Quarkus cela suffit pour recompiler/deployer votre app), vous constaterez en appelant votre service Rest que seul un nœud reçoit le message.*
+By default, the broadcast method sends to all nodes that meet the cluster selection. The other methods perform load balancing. By executing your REST call several times, you will observe the distribution of log messages in the two server consoles.
 
-La méthode broadcast envoi par défaut sur tous les nœuds répondant à la sélection du cluster.
-Les autres méthodes opèrent un load balancing.
-En exécutant plusieurs fois votre appel REST, vous allez constater une distribution des messages de logs dans les deux consoles des serveurs.
+By default, jobs are evenly distributed in RoundRobin fashion. However, it is possible to configure *JobStealing* to distribute the load on unoccupied nodes (https://ignite.apache.org/docs/latest/distributed-computing/load-balancing).
 
-Par défaut, les jobs sont répartis de manière équitable en RoundRobin.
-Mais il est possible de paramétrer le *JobStealing* pour répartir la charge sur les nœuds non occupés.
-(https://ignite.apache.org/docs/latest/distributed-computing/load-balancing)
+*Injected Resources*
 
-'''
-
-*Resources injectées*
-
-Pour démontrer l'utilisation des resources Ignite injectées, créez-vous une classe :
+To demonstrate the use of injected Ignite resources, create a class:
 
 [,java]
 ----
@@ -247,7 +227,7 @@ public class GetNodeUID implements IgniteCallable<String> {
 }
 ----
 
-Puis dans un service REST, appelez et affichez le résultat :
+Then, in a REST service, call and display the result:
 
 [,java]
 ----
@@ -263,7 +243,7 @@ public Response getNodeUID() {
 }
 ----
 
-Par curiosité, essayez d'utiliser une classe anonyme et observez lors de votre appel de service REST l'erreur qui est produite :
+Out of curiosity, try using an anonymous class and observe the error produced when calling your REST service:
 
 [,java]
 ----
@@ -281,17 +261,14 @@ public Response anonymousClass() {
                        }
             )
             .stream()
-            .forEach(returned -> log.info("Capted = {}'", returned));
+            .forEach(returned -> log.info("Captured = {}'", returned));
     return Response.ok().build();
 }
 ----
 
-'''
+*Calls can also be asynchronous*
 
-*Les appels peuvent aussi être asynchrones*
-
-Et l'on peut consommer la réponse de manière réactive !
-Ajoutez une méthode REST pour tester cela :
+And you can consume the response reactively! Add a REST method to test this:
 
 [,java]
 ----
@@ -305,8 +282,7 @@ public Response async() {
 }
 ----
 
-Le code de retour est ici exécuté dans un Thread géré par ignite.
-Vous pouvez toutefois choisir d'utiliser votre propre ExecutorService  avec la méthode listenAsync, et donc vous pouvez utiliser un pool de Threads managés :
+The return code here is executed in a thread managed by Ignite. However, you can choose to use your own ExecutorService with the listenAsync method, allowing you to use a managed thread pool:
 
 [,java]
 ----
@@ -320,41 +296,38 @@ public void listenAsyncManagedExecutor() throws InterruptedException {
                     after -> log.info("Return handled in thread {}", Thread.currentThread()),
                     managedExecutor
             );
-    Thread.sleep(20000); // this to guarantee that the current thread will not be used when the response will come
+    Thread.sleep(20000); // this guarantees that the current thread will not be used when the response comes
 }
 ----
 
-*Il est aussi possible d'affecter les jobs par clef d'affinité sur un cache*
+*Jobs can also be assigned by affinity key on a cache*
 
-Il existe d'autre API d'exécution de Jobs, comme le map/reduce (https://ignite.apache.org/docs/latest/distributed-computing/map-reduce).
-Vous pouvez tenter une implémentation de l'exemple de la documentation d'Ignite (ComputeTaskExample).
+There are other job execution APIs, such as map/reduce (https://ignite.apache.org/docs/latest/distributed-computing/map-reduce). You can attempt an implementation of the example in Ignite's documentation (ComputeTaskExample).
 
-== Services Ignite (https://ignite.apache.org/docs/latest/services/services)
+== Ignite Services (https://ignite.apache.org/docs/latest/services/services)
 
-Il est aussi possible de deployer des services sur les nœuds Ignite et de les exposer à l'aide d'une interface.
+It is also possible to deploy services on Ignite nodes and expose them using an interface.
 
-Les services peuvent être déployés en tant que :
+Services can be deployed as:
 
-* Singleton par Cluser
-* Singleton par Node
+* Singleton per Cluster
+* Singleton per Node
 
-Mais aussi :
+But also:
 
-* Par affinité, par filtre de Node etc...
-* Avec un nombre determiné d'instances.
+* By affinity, by Node filter, etc.
+* With a determined number of instances.
 
-'''
-
-*Dans le module node-service, créez-vous un interface de votre service* Par exemple
+*In the node-service module, create an interface for your service.* For example:
 
 [,java]
 ----
 public interface MySimpleService {
-    Integer add(Integer a,Integer b);
+    Integer add(Integer a, Integer b);
 }
 ----
 
-*Dans le module node-server* Ajoutez un service Quarkus implémentant l'interface (notez le @Unremovable)
+*In the node-server module,* add a Quarkus service implementing the interface (note the @Unremovable):
 
 [,java]
 ----
@@ -365,13 +338,13 @@ public interface MySimpleService {
 public class QuarkusIgniteService implements MySimpleService {
     @Override
     public Integer add(Integer a, Integer b) {
-        log.info("Call add for {} and {}",a,b);
-        return a+b;
+        log.info("Call add for {} and {}", a, b);
+        return a + b;
     }
 }
 ----
 
-Puis ajoutons le "service" ignite, qui in fine sert de proxy :
+Then add the Ignite "service," which ultimately serves as a proxy:
 
 [,java]
 ----
@@ -389,12 +362,12 @@ public class QuarkusIgniteServiceProxy implements Service, MySimpleService {
 }
 ----
 
-Il ne reste plus qu'à ajouter la configuration du service dans la class Boot du serveur :
+All that's left is to add the service configuration in the Boot class of the server:
 
 [,java]
 ----
 ClusterGroup grp = ignite.cluster().forAttribute("nodeType", "server");
-log.info("grp {}",grp.nodes());
+log.info("grp {}", grp.nodes());
 ignite.services(grp).deploy(
         new ServiceConfiguration()
                 .setName("MySimpleService")
@@ -403,22 +376,22 @@ ignite.services(grp).deploy(
 );
 ----
 
-Puis, pour tester coté node-client, un service REST :
+Then, to test on the node-client side, create a REST service:
 
 [,java]
 ----
 @GET
 @Path("/callRemoteAdd/{a}/{b}")
-public void callRemoteAdd(@PathParam("a")int a,@PathParam("b")int b){
+public void callRemoteAdd(@PathParam("a")int a, @PathParam("b")int b){
         MySimpleService mySimpleService = ignite.services(ignite.cluster().forAttribute("nodeType", "server"))
         .serviceProxy("MySimpleService", MySimpleService.class, false);
-        log.info("Remote Call {} plus {} = {}",a,b,mySimpleService.add(a,b));
+        log.info("Remote Call {} plus {} = {}", a, b, mySimpleService.add(a, b));
 
 }
 ----
 
-**Les services, comme les jobs, peuvent être déployés à distance, stoppés, et re-déployés.
+**Services, like jobs, can be deployed remotely, stopped, and redeployed.
 
-== d'autre fonctionnalités.
+== Other features.
 
-S'il vous reste encore du temps, explorer l'api IgniteMessaging qui est aussi très intéressante dans le cadre d'une application micro-services (https://ignite.apache.org/docs/latest/messaging)
+If you still have time, explore the IgniteMessaging API, which is also very interesting in the context of a microservices application (https://ignite.apache.org/docs/latest/messaging)

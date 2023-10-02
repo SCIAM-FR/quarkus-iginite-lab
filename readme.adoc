@@ -8,11 +8,7 @@ TIP: la documentation est aussi disponible dans les livrables du repository gith
 
 * Les éléments pour effectuer le lab sous forme de :
 
-** Un projet ignite permettant de créer un cluster dans le répertoire `ignite`
-** Une série de 3 TP dans les répertoires `tp1-2` et `tp3` permettant de réaliser le lab
-
-Merci de vous référer à la documentation pour plus d'informations sur le lab.
-
+Please refer to the documentation for more information about the lab.
 ## Opening the workspace in GitPod
 
 To open the workspace, simply click on the *Open in Gitpod* button, or use https://gitpod.io/#https://github.com/SCIAM-FR/quarkus-iginite-lab.git.
