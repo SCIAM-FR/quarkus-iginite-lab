@@ -14,4 +14,4 @@ To open the workspace, simply click on the *Open in Gitpod* button, or use https
 
 image::https://gitpod.io/button/open-in-gitpod.svg[link=https://gitpod.io/#https://github.com/SCIAM-FR/quarkus-iginite-lab.git]
 
-Big Thanks to Horacio https://twitter.com/LostInBrittany[@LostInBrittany] for his help with Gitpod!
+Big Thanks to Horacio https://github.com/LostInBrittany[@LostInBrittany] for his help with Gitpod!
