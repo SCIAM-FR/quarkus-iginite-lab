@@ -9,3 +9,4 @@ vscode:
     extensions:
         - vscjava.vscode-java-pack
         - asciidoctor.asciidoctor-vscode
+        - anwar.papyrus-pdf
