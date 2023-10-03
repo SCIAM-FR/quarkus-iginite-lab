@@ -14,4 +14,6 @@ To open the workspace, simply click on the *Open in Gitpod* button, or use https
 
 image::https://gitpod.io/button/open-in-gitpod.svg[link=https://gitpod.io/#https://github.com/SCIAM-FR/quarkus-iginite-lab.git]
 
+After opening the workspace in Gitpod, wait a few minutes, it's going to install the right version of Java (Java 17) and generate the docs with Maven. At the end, the main PDF file for the doc will automatically open in the workspace.
+
 Big Thanks to Horacio https://github.com/LostInBrittany[@LostInBrittany] for his help with Gitpod!
