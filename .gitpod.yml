@@ -3,10 +3,20 @@ image:
 
 tasks:
   - name: Install Java 17
-    init: sdk install java 17.0.8-oracle < /dev/null
+    init: |
+      sdk install java 17.0.8-oracle < /dev/null
+      gp sync-done java
+
+  - name: Generate and view PDF doc
+    command: >
+      gp sync-await java ;
+      cd doc ;
+      mvn ;
+      gp open /workspace/quarkus-ignite-lab/doc/target/generated-docs/main.pdf
 
 vscode:
     extensions:
         - vscjava.vscode-java-pack
         - asciidoctor.asciidoctor-vscode
         - anwar.papyrus-pdf
+        - redhat.vscode-quarkus
