@@ -10,7 +10,7 @@ TIP: The documentation is also available in the GitHub repository deliverables a
 Please refer to the documentation for more information about the lab.
 
 ## Opening the Workspace in Gitpod
-To open the workspace, simply click on the *Open in Gitpod* button, or use https://gitpod.io/#https://github.com/SCIAM-FR/quarkus-iginite-lab.git.
+To open the workspace, simply click on the *Open in Gitpod* button, or use https://gitpod.io/#https://github.com/SCIAM-FR/quarkus-iginite-lab.git[this link].
 
 image::https://gitpod.io/button/open-in-gitpod.svg[link=https://gitpod.io/#https://github.com/SCIAM-FR/quarkus-iginite-lab.git]
 
