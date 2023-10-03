@@ -119,8 +119,10 @@ public class ConnectToIgniteCluster {
         ClientAtomicLong hitCounter = igniteClient.atomicLong("hitCounter", 0L, true);
         long counter = hitCounter.incrementAndGet();
         log.info("Current hit {}", counter);
-        return Response.ok("{ Hit : \"" + counter + "\"}").build();
+        return Response.ok(new Counter(counter)).build();
     }
+
+    public record Counter(Long hit) {}
 }
 ----
 
