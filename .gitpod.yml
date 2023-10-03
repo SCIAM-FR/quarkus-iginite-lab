@@ -12,7 +12,7 @@ tasks:
       gp sync-await java ;
       cd doc ;
       mvn ;
-      gp open /workspace/quarkus-iginite-lab/doc/target/generated-docs/main.pdf
+      gp open target/generated-docs/main.pdf
 
 vscode:
     extensions:
