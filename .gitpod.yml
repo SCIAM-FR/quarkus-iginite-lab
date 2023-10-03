@@ -21,3 +21,4 @@ vscode:
         - asciidoctor.asciidoctor-vscode
         - anwar.papyrus-pdf
         - redhat.vscode-quarkus
+        - vsls-contrib.codetour
