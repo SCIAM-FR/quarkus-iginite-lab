@@ -171,7 +171,7 @@ The main differences are in the capabilities of services, which, in the case of 
 
 Using the client-side cache API (https://ignite.apache.org/docs/latest/thin-clients/java-thin-client)
 
-[source,java]
+[,java]
 ----
 ClientCache<Integer, String> cache = client.cache("myCache");
 ----
