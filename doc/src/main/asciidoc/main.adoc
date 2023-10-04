@@ -24,7 +24,7 @@ Each module contains a TPx.md file that provides you with the steps to follow.
 The Apache Ignite framework is very rich in features.
 The purpose of this lab is to provide you with some examples and encourage you to explore further.
 
-https://tinyurl.com/5eshwjpa
+https://tinyurl.com/quarkus-ignite-lab
 
 :sectnums:
 
