@@ -1,6 +1,6 @@
 = Lab Exercise 2: Apache Ignite, a Distributed Database
 
-== If You Haven't Completed TP1#
+== Only if You Haven't Completed TP1#
 
 === Deploying 3 Ignite Server Nodes
 
@@ -14,38 +14,30 @@ For Linux/Mac:
 ----
 cd ignite
 ./mvnw clean install
-chmod +x ./target/apache-ignite-2.14.0-bin/bin/ignite.sh
 ----
 
 For Windows:
 
-[,shell]
+[source,shell]
 ----
 cd ignite
 ./mvnw.cmd clean install
 ----
 
-Once the preparation is done, we can run the following commands three times (once per terminal):
+Once the preparation is done, we can run the following commands three times (once per terminal) from project root:
 
 For Linux/Mac:
 
-[,shell]
+[source,shell]
 ----
-cd ./target/apache-ignite-2.14.0-bin
-export OPTION_LIBS=ignite-rest-http,ignite-calcite
-export CONFIG_URI=file://config/node-configuration.xml
-export JVM_OPTS="-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDirectMemorySize=256m   --add-opens java.base/java.lang.invoke=ALL-UNNAMED "
-./bin/ignite.sh
+./startIgniteNode.sh
 ----
 
 For Windows PowerShell:
 
-[,shell]
+[source,powershell]
 ----
-$env:OPTION_LIBS = 'ignite-rest-http,ignite-calcite'
-$env:CONFIG_URI = 'file://config/node-configuration.xml'
-$env:JVM_OPTS = '-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDirectMemorySize=256m'
-.\target\apache-ignite-2.14.0-bin/bin/ignite.bat
+./startIgniteNode.ps1
 ----
 
 In the logs of one of the nodes, you will find the URL to connect a monitoring tool provided by Gridgain: image:../resources/images/screen3.png[img.png]
@@ -73,7 +65,7 @@ We will create "Accounts" and "Operations" Tables/Caches and populate them with 
 
 === Creating Tables.
 
-The sources contain 2 SQL scripts that we will execute with the Thin Client.
+The sources contain 2 SQL scripts that we will execute with the Thin Client. Don't execute them manually ! The Rest service will do.
 
 Accounts Table:
 
@@ -131,7 +123,11 @@ Then start your Quarkus:
 ./mvnw quarkus:dev
 ----
 
-And then you can call your REST service link:src/http-requests/ignite-db/createSchemas.http[here].
+And then you can call your REST service
+
+(or you can access swagger ui http://localhost:8083/q/dev-ui/io.quarkus.quarkus-smallrye-openapi/swagger-ui)
+
+http://localhost:8083/ignite/tp2/createSchemas
 
 You can then check in Nebula for the appearance of caches and tables in the Caches tab.
 
@@ -278,7 +274,10 @@ public class FeedDb {
 }
 ----
 
-Once in place, you can reload your Quarkus and call the HTTP request link:src/http-requests/ignite-db/feedDb.http[here].
+Once in place, you can reload your Quarkus and call the HTTP request
+(use swagger or http://localhost:8083/ignite/tp2/feedDb/10/5/500 )
+
+
 
 When the execution is complete, we can use Nebula or your JDBC tool to check the presence of data:
 

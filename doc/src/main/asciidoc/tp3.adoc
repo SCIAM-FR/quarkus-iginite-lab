@@ -49,7 +49,7 @@ On the client side, only one additional line indicates that we are starting in "
 igniteConfiguration.setClientMode(true);
 ----
 
-First of all, let's compile the modules:
+First of all, let's compile the modules (if it's not already done):
 
 [,shell]
 ----
