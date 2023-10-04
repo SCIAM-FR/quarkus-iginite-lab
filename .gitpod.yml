@@ -12,13 +12,13 @@ tasks:
       gp sync-await java ;
       cd doc ;
       mvn ;
-      gp open /workspace/quarkus-ignite-lab/doc/target/generated-docs/main.pdf
+      gp open target/generated-docs/main.pdf
 
 vscode:
     extensions:
         - vscjava.vscode-java-pack
+        - redhat.java
         - asciidoctor.asciidoctor-vscode
         - anwar.papyrus-pdf
         - redhat.vscode-quarkus
-
-
+        - vsls-contrib.codetour
