@@ -157,6 +157,12 @@ Now you can make the HTTP request on your second instance at http://localhost:80
 
 In the server logs, you will see the counters incrementing on both nodes.
 
+== Check hitCounter value in grid
+
+You can check also the value of the counter from the nebula tool itself, by accessing the sys.ds_atomiclongs table
+
+image::../resources/images/screen5.1.png[img.png]
+
 == Explore Other Possibilities
 
 The Apache Ignite Thin Java client provides a rich API that allows you to use most of Apache Ignite's features.
