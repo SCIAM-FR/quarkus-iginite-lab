@@ -2,7 +2,7 @@
 
 == Prerequesite
 
-Do a mvn clean install at the project root
+#Do a mvn clean install at the project root#
 
 == Deploying 3 Ignite Server Nodes
 
@@ -14,38 +14,24 @@ For Linux/Mac:
 
 [source,shell]
 ----
-cd ignite
-chmod +x ./target/apache-ignite-2.14.0-bin/bin/ignite.sh
+chmod +x ./startIgniteNode.sh
+
 ----
 
-For Windows:
-
-[source,shell]
-----
-cd ignite
-----
-
-Once the preparation is done, we can run the following commands #three times# (once per terminal):
+We can run the following commands #three times# (once per terminal):
 
 For Linux/Mac from ignite module root:
 
 [source,shell]
 ----
-cd ./target/apache-ignite-2.14.0-bin
-export OPTION_LIBS=ignite-rest-http,ignite-calcite
-export CONFIG_URI=file://config/node-configuration.xml
-export JVM_OPTS="-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDirectMemorySize=256m --add-opens java.base/java.lang.invoke=ALL-UNNAMED"
-./bin/ignite.sh
+./startIgnite.sh
 ----
 
 For Windows PowerShell:
 
 [source,shell]
 ----
-$env:OPTION_LIBS = 'ignite-rest-http,ignite-calcite'
-$env:CONFIG_URI = 'file://config/node-configuration.xml'
-$env:JVM_OPTS = '-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDirectMemorySize=256m --add-opens java.base/java.lang.invoke=ALL-UNNAMED'
-./target/apache-ignite-2.14.0-bin/bin/ignite.bat
+startIgnite.ps1
 ----
 
 In the logs of one of the nodes, you will find the URL to connect a monitoring tool provided by GridGain: image:../resources/images/screen3.png[img.png]
@@ -65,21 +51,9 @@ http://localhost:8080/ignite?cmd=version
 
 == Quick Creation of a Quarkus Client
 
-Now with your terminal go to tp1-2 module
+Now with your terminal go to #tp1-2# module
 
-[source,shell]
-----
-cd ../tp1-2
-----
-
-You may have noticed that Ignite REST services listen on port 8080. We need to tell Quarkus to use a different port.
-
-In the application.properties file in the resources, add the following property:
-
-[,properties]
-----
-quarkus.http.port=8083
-----
+You may have noticed that Ignite REST services listen on port 8080. We need to tell Quarkus to use a different port. if you take a look into resources/application.properties you will see that the quarkus http port is set to 8083.
 
 Let's move on to the client. Add a Producer that will create an instance of the IgniteClient object:
 
@@ -135,6 +109,10 @@ Let's check the operation:
 
 Then, once it's started, make several HTTP requests to http://localhost:8083/ignite/testconnect and check the logs to see what happens.
 
+You can use your swagger ui to execute the request :
+http://localhost:8083/q/dev-ui/io.quarkus.quarkus-smallrye-openapi/swagger-ui
+
+
 == Deploying a Second Instance of the Service
 
 But how can we be sure that the counter isn't local? Well, we will use a second instance!
@@ -163,7 +141,7 @@ You can check also the value of the counter from the nebula tool itself, by acce
 
 image::../resources/images/screen5.1.png[img.png]
 
-== Explore Other Possibilities
+== Explore Other Possibilities (Optional)
 
 The Apache Ignite Thin Java client provides a rich API that allows you to use most of Apache Ignite's features.
 
