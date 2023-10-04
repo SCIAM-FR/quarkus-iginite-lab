@@ -1,8 +1,8 @@
 = Hands-on-lab Ignite et Quarkus
 :author: Yann Blazart, Pierre Cesmat, Antoine Sabot-Durand
 :email: yann.blazart@sciam.fr
-:revnumber: 1.0
-:revdate: September 14 2023
+:revnumber: 1.1
+:revdate: October 4 2023
 :doctype: book
 
 
