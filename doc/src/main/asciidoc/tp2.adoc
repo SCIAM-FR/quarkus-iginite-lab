@@ -1,6 +1,6 @@
 = Lab Exercise 2: Apache Ignite, a Distributed Database
 
-== #If You Haven't Completed TP1#
+== If You Haven't Completed TP1#
 
 === Deploying 3 Ignite Server Nodes
 
@@ -10,7 +10,7 @@ To deploy it, please execute from project root:
 
 For Linux/Mac:
 
-[,shell]
+[source,shell]
 ----
 cd ignite
 ./mvnw clean install

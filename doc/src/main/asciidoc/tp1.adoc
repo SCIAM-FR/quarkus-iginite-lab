@@ -34,7 +34,7 @@ For Linux/Mac from ignite module root:
 cd ./target/apache-ignite-2.14.0-bin
 export OPTION_LIBS=ignite-rest-http,ignite-calcite
 export CONFIG_URI=file://config/node-configuration.xml
-export JVM_OPTS="-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDirectMemorySize=256m"
+export JVM_OPTS="-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDirectMemorySize=256m --add-opens java.base/java.lang.invoke=ALL-UNNAMED"
 ./bin/ignite.sh
 ----
 
@@ -44,7 +44,7 @@ For Windows PowerShell:
 ----
 $env:OPTION_LIBS = 'ignite-rest-http,ignite-calcite'
 $env:CONFIG_URI = 'file://config/node-configuration.xml'
-$env:JVM_OPTS = '-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDirectMemorySize=256m'
+$env:JVM_OPTS = '-Xms256m -Xmx512m -server -XX:MaxMetaspaceSize=256m -XX:MaxDirectMemorySize=256m --add-opens java.base/java.lang.invoke=ALL-UNNAMED'
 ./target/apache-ignite-2.14.0-bin/bin/ignite.bat
 ----
 
@@ -119,8 +119,10 @@ public class ConnectToIgniteCluster {
         ClientAtomicLong hitCounter = igniteClient.atomicLong("hitCounter", 0L, true);
         long counter = hitCounter.incrementAndGet();
         log.info("Current hit {}", counter);
-        return Response.ok("{ Hit : \"" + counter + "\"}").build();
+        return Response.ok(new Counter(counter)).build();
     }
+
+    public record Counter(Long hit) {}
 }
 ----
 
@@ -169,7 +171,7 @@ The main differences are in the capabilities of services, which, in the case of 
 
 Using the client-side cache API (https://ignite.apache.org/docs/latest/thin-clients/java-thin-client)
 
-[source,java]
+[,java]
 ----
 ClientCache<Integer, String> cache = client.cache("myCache");
 ----
