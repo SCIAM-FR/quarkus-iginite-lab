@@ -2,17 +2,20 @@
 
 == Why?
 
-We have previously seen that it is quite simple to use the Java thin client to access Ignite. However, this connection mode has some limitations:
+We have previously seen that it is quite simple to use the Java thin client to access Ignite.
+However, this connection mode has some limitations:
 
 * Fewer technical possibilities:
 ** The Ignite services we want to call must already be deployed on the Ignite server nodes.
 ** The client cannot really receive events or provide additional services to the grid.
 ** The DataStreamer, which allows for fast data feeding, is not available in the Thin Client.
-* It forces us to treat Ignite servers as off-the-shelf products. This complicates delivery and operation procedures in some complex structures.
+* It forces us to treat Ignite servers as off-the-shelf products.
+This complicates delivery and operation procedures in some complex structures.
 
 An Ignite node can be configured in "client mode", meaning it will not host data (except for near cache) but can "contribute" its services to the grid.
 
-In this TP, given the limited time available, we cannot explore all the possibilities of the framework. That's why we have chosen to introduce you to some aspects that, in our opinion, are useful in a microservice-oriented architecture with Quarkus.
+In this TP, given the limited time available, we cannot explore all the possibilities of the framework.
+That's why we have chosen to introduce you to some aspects that, in our opinion, are useful in a microservice-oriented architecture with Quarkus.
 
 == Presentation of the modules.
 
@@ -23,7 +26,8 @@ In TP3, we have 3 submodules:
 ** We will launch 2 instances of this microservice.
 * node-service: a module that allows us to share common interfaces and models between "client" and "server."
 
-In the client and server modules, the Boot and IgniteProducer classes are already ready to use. In addition to TP1 and TP2, besides the fact that we produce an 'Ignite' instance instead of 'IgniteClient', you will see some configuration differences:
+In the client and server modules, the Boot and IgniteProducer classes are already ready to use.
+In addition to TP1 and TP2, besides the fact that we produce an 'Ignite' instance instead of 'IgniteClient', you will see some configuration differences:
 
 [,java]
 ----
@@ -51,7 +55,7 @@ igniteConfiguration.setClientMode(true);
 
 First of all, let's compile the modules (if it's not already done):
 
-[,shell]
+[source,shell]
 ----
 ./mvnw clean install
 ----
@@ -109,7 +113,8 @@ The Swagger UIs are accessible here:
 
 == Distributed Computing (https://ignite.apache.org/docs/latest/distributed-computing/distributed-computing)
 
-This part of the API allows you to send code to execute on remote nodes. Very powerful, you can:
+This part of the API allows you to send code to execute on remote nodes.
+Very powerful, you can:
 
 * Send code to execute on all nodes or according to a selection.
 * Take advantage of load balancing and/or failover mechanisms.
@@ -124,17 +129,20 @@ To call "Pure Quarkus" services, whose classes are "managed," we recommend using
 CDI.current().select(MyService.class).get().....
 ----
 
-Also, be very careful with Anonymous classes, which, during serialization, carry the entire cluster of parent classes with them. This can sometimes cause issues during deserialization.
+Also, be very careful with Anonymous classes, which, during serialization, carry the entire cluster of parent classes with them.
+This can sometimes cause issues during deserialization.
 
 === Sending code to all selected nodes.
 
 ____
-CAUTION: The code sent to a remote node will be executed in an Apache Ignite thread. If you want to use a Quarkus service, it may be necessary to use the @ContextActivator annotation on it.
+CAUTION: The code sent to a remote node will be executed in an Apache Ignite thread.
+If you want to use a Quarkus service, it may be necessary to use the @ContextActivator annotation on it.
 ____
 
 *Create a REST service in the node-client that injects an Ignite instance; we will use it.*
 
-Let's say we want to execute a task on all server-type nodes, such as clearing caches, compressing directories, etc. The Ignite compute API allows us to send code to the chosen nodes.
+Let's say we want to execute a task on all server-type nodes, such as clearing caches, compressing directories, etc.
+The Ignite compute API allows us to send code to the chosen nodes.
 
 To do this, we use the *IgniteCompute* class and its *broadcast()* method.
 
@@ -158,7 +166,8 @@ public class ExerciceRest_3_3 {
 
 (the 'ignite' variable is injected by Quarkus; the instance is created by the Producer).
 
-However, before the compute method addresses the entire cluster, including client-mode nodes, it can take a ClusterGroup as a parameter that selects the target nodes. To describe a ClusterGroup, simply use:
+However, before the compute method addresses the entire cluster, including client-mode nodes, it can take a ClusterGroup as a parameter that selects the target nodes.
+To describe a ClusterGroup, simply use:
 
 [,java]
 ----
@@ -207,9 +216,12 @@ You have probably noticed that this code uses remote class loading.
 
 *Replace 'broadcast' with 'run,' then press F5 on the client's Swagger UI (with Quarkus, this is enough to recompile/deploy your app), and you will see that when you call your REST service, only one node receives the message.*
 
-By default, the broadcast method sends to all nodes that meet the cluster selection. The other methods perform load balancing. By executing your REST call several times, you will observe the distribution of log messages in the two server consoles.
+By default, the broadcast method sends to all nodes that meet the cluster selection.
+The other methods perform load balancing.
+By executing your REST call several times, you will observe the distribution of log messages in the two server consoles.
 
-By default, jobs are evenly distributed in RoundRobin fashion. However, it is possible to configure *JobStealing* to distribute the load on unoccupied nodes (https://ignite.apache.org/docs/latest/distributed-computing/load-balancing).
+By default, jobs are evenly distributed in RoundRobin fashion.
+However, it is possible to configure *JobStealing* to distribute the load on unoccupied nodes (https://ignite.apache.org/docs/latest/distributed-computing/load-balancing).
 
 *Injected Resources*
 
@@ -268,7 +280,8 @@ public Response anonymousClass() {
 
 *Calls can also be asynchronous*
 
-And you can consume the response reactively! Add a REST method to test this:
+And you can consume the response reactively!
+Add a REST method to test this:
 
 [,java]
 ----
@@ -282,10 +295,13 @@ public Response async() {
 }
 ----
 
-The return code here is executed in a thread managed by Ignite. However, you can choose to use your own ExecutorService with the listenAsync method, allowing you to use a managed thread pool:
+The return code here is executed in a thread managed by Ignite.
+However, you can choose to use your own ExecutorService with the listenAsync method, allowing you to use a managed thread pool:
 
 [,java]
 ----
+private final ExecutorService managedExecutor = Executors.newSingleThreadExecutor();
+
 @GET
 @Path("listenAsyncManagedExecutor")
 public void listenAsyncManagedExecutor() throws InterruptedException {
@@ -296,13 +312,14 @@ public void listenAsyncManagedExecutor() throws InterruptedException {
                     after -> log.info("Return handled in thread {}", Thread.currentThread()),
                     managedExecutor
             );
-    Thread.sleep(20000); // this guarantees that the current thread will not be used when the response comes
+    Thread.sleep(10*1000); // this guarantees that the current thread will not be used when the response comes
 }
 ----
 
 *Jobs can also be assigned by affinity key on a cache*
 
-There are other job execution APIs, such as map/reduce (https://ignite.apache.org/docs/latest/distributed-computing/map-reduce). You can attempt an implementation of the example in Ignite's documentation (ComputeTaskExample).
+There are other job execution APIs, such as map/reduce (https://ignite.apache.org/docs/latest/distributed-computing/map-reduce).
+You can attempt an implementation of the example in Ignite's documentation (ComputeTaskExample).
 
 == Ignite Services (https://ignite.apache.org/docs/latest/services/services)
 
@@ -378,15 +395,14 @@ ignite.services(grp).deploy(
 
 Then, to test on the node-client side, create a REST service:
 
-[,java]
+[source,java]
 ----
 @GET
 @Path("/callRemoteAdd/{a}/{b}")
-public void callRemoteAdd(@PathParam("a")int a, @PathParam("b")int b){
-        MySimpleService mySimpleService = ignite.services(ignite.cluster().forAttribute("nodeType", "server"))
-        .serviceProxy("MySimpleService", MySimpleService.class, false);
-        log.info("Remote Call {} plus {} = {}", a, b, mySimpleService.add(a, b));
-
+public void callRemoteAdd(@DefaultValue("20") @PathParam("a")int a, @DefaultValue("20") @PathParam("b")int b){
+    MySimpleService mySimpleService = ignite.services(ignite.cluster().forAttribute("nodeType", "server"))
+            .serviceProxy("MySimpleService", MySimpleService.class, false);
+    log.info("Remote Call {} plus {} = {}", a, b, mySimpleService.add(a, b));
 }
 ----
 

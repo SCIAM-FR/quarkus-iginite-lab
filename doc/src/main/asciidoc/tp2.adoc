@@ -234,7 +234,7 @@ FeedDb Class:
 
 [,java]
 ----
-@Path("/ignite/tp2/feedDb")
+@Path("/ignite-tp2/feedDb")
 @Slf4j
 @RequiredArgsConstructor
 public class FeedDb {
@@ -243,7 +243,10 @@ public class FeedDb {
     @SuppressWarnings("BigDecimalMethodWithoutRoundingCalled")
     @GET
     @Path("/{nbAccounts}/{nbAccountsInError}/{nbOperationsPerAccount}")
-    public Response feedTheDb(@PathParam("nbAccounts") Integer nbAccounts, @PathParam("nbAccountsInError") Integer nbAccountsInError, @PathParam("nbOperationsPerAccount") Integer nbOperationsPerAccount) {
+    public Response feedTheDb(
+            @DefaultValue("20") @PathParam("nbAccounts") Integer nbAccounts,
+            @DefaultValue("5") @PathParam("nbAccountsInError") Integer nbAccountsInError,
+            @DefaultValue("20") @PathParam("nbOperationsPerAccount") Integer nbOperationsPerAccount) {
         ClientCache<AccountKey, Account> accounts = igniteClient.getOrCreateCache("accounts");
         ClientCache<OperationKey, Operation> operations = igniteClient.getOrCreateCache("operations");
         log.info("Get caches {} , {}",accounts,operations);
