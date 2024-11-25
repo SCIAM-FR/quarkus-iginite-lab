@@ -43,5 +43,6 @@ public class Boot {
             .setMaxPerNodeCount(1)
             .setService(new QuarkusIgniteServiceProxy())
     );
+
   }
 }

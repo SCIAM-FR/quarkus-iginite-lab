@@ -1,5 +1,10 @@
 package fr.sciam.lab.ignite.model;
 
-public class Account {
+import lombok.Data;
 
+import java.math.BigDecimal;
+
+@Data
+public class Account {
+    private BigDecimal amount;
 }
