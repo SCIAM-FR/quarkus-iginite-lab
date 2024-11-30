@@ -1,0 +1,1 @@
+./mvnw -pl node-server quarkus:dev -Dnode.name=serverNode2 -Dquarkus.http.port=8082 -Ddebug=5007

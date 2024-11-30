@@ -1,0 +1,1 @@
+./mvnw -pl node-client quarkus:dev -Dnode.name=clientNode1 -Dquarkus.http.port=8085 -Ddebug=5010
