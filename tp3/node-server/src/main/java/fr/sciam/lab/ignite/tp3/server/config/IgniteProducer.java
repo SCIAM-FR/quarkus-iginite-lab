@@ -9,9 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.configuration.IgniteConfiguration;
+import org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi;
+import org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -45,6 +48,13 @@ public class IgniteProducer {
                 "nodeName", nodeName,
                 "httpPort", httpPort.toString())
         );
+
+        TcpDiscoverySpi tcpDiscoverySpi=new TcpDiscoverySpi();
+        igniteConfiguration.setDiscoverySpi(tcpDiscoverySpi);
+        TcpDiscoveryVmIpFinder tcpDiscoveryVmIpFinder = new TcpDiscoveryVmIpFinder();
+        tcpDiscoverySpi.setIpFinder(tcpDiscoveryVmIpFinder);
+        tcpDiscoveryVmIpFinder.setAddresses(List.of("127.0.0.1:47500..47509"));
+
         igniteConfiguration.setClassLoader(Thread.currentThread().getContextClassLoader());
         igniteConfiguration.setPeerClassLoadingEnabled(true);
         return igniteConfiguration;
